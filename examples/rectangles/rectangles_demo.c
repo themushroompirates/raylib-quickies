@@ -14,6 +14,10 @@ typedef enum {
     DEMO_POSITION,
     DEMO_GRID_CELL,
     DEMO_GRID_CELL_EX,
+    DEMO_SLICE_X,
+    DEMO_SLICE_Y,
+    DEMO_SLICE_X_EX,
+    DEMO_SLICE_Y_EX,
     DEMO_MAX
 } DemoIndex;
 
@@ -33,6 +37,24 @@ void LayoutFloatInput(Rectangle *bounds, const char *label, float *value, float 
     bounds->y += bounds->height + 4.0f;
 }
 
+void DrawRectangleGuides(Rectangle rectangle, Color color) {
+    char *text;
+    float textHeight = 10, textWidth;
+    
+    float xC = rectangle.x + 0.5f * rectangle.width;
+    float yC = rectangle.y + 0.5f * rectangle.height;
+    
+    float padding = 5;
+    
+    text = TextFormat("%.0f x %.0f", rectangle.width, rectangle.height);
+    textWidth = MeasureText(text, 10);
+    
+    if (rectangle.width > textWidth + padding * 2 && rectangle.height > textHeight + padding * 2) {
+        DrawText(text, xC - 0.5f * textWidth, yC - 0.5f * textHeight, 10, color);
+        return;
+    }   
+}
+
 int main(void) {
     SetConfigFlags(FLAG_WINDOW_RESIZABLE | FLAG_MSAA_4X_HINT | FLAG_VSYNC_HINT);
     InitWindow(800, 450, "Rects Helper Demo");
@@ -44,6 +66,8 @@ int main(void) {
     
     Rectangle container = (Rectangle){ 100, 100, 200, 150 };
     
+    // Variables for all the demos
+    // Ugly but it is what it is
     float demo0AmountX = 5.0f;
     float demo0AmountY = 5.0f;
     float demo1Amount  = 5.0f;
@@ -71,9 +95,19 @@ int main(void) {
     float demo5RowSpan = 2;
     float demo5Spacing   = 5.0f;
     
-    Rectangle controlsPane = RectanglePosition(GetScreenRect(), (Vector2){0,0}, (Vector2){300, GetScreenHeight()} );
-    controlsPane.width += 8;
-    Rectangle resultPane   = RectanglePosition(GetScreenRect(), (Vector2){1,0}, (Vector2){GetScreenWidth()-300, GetScreenHeight()} );
+    float demo6Amount = 50.0f;
+    
+    float demo7Amount = 50.0f;
+    
+    float demo8Amount = 50.0f;
+    float demo8Spacing = 5.0f;
+    
+    float demo9Amount = 50.0f;
+    float demo9Spacing = 5.0f;
+    
+    // Positioning
+    Rectangle controlsPane, resultPane;
+    controlsPane = RectangleSliceVerticalEx(GetScreenRect(), 300, -8, &resultPane);
     
     container = RectanglePosition(resultPane, (Vector2){0.5f, 0.5f}, (Vector2){200, 150});
     container.y -= 60;
@@ -85,11 +119,7 @@ int main(void) {
     while (!WindowShouldClose()) {
         
         if (IsWindowResized()) {
-            // @TODO these nasty calculations are exactly what this library is for
-            // Extend it and make this simpler!!
-            controlsPane = RectanglePosition(GetScreenRect(), (Vector2){0,0}, (Vector2){300, GetScreenHeight()} );
-            controlsPane.width += 8;
-            resultPane   = RectanglePosition(GetScreenRect(), (Vector2){1,0}, (Vector2){GetScreenWidth()-300, GetScreenHeight()} );
+            controlsPane = RectangleSliceVerticalEx(GetScreenRect(), 300, -8, &resultPane);
             container = RectanglePosition(resultPane, (Vector2){0.5f, 0.5f}, (Vector2){200, 150});
             container.y -= 60;
         }
@@ -105,8 +135,8 @@ int main(void) {
             DrawRectangleLinesEx(container, 1.0f, GetColor(0x838383ff));
             
             Rectangle result;
+            Rectangle result2 = { 0 };
             
-            //Rectangle controlBounds = (Rectangle){ 600, 60, 200, 20 };
             Rectangle controlBounds = RectangleInflatePro(controlsPane, -48, -16-32, -16, -16-32);
             controlBounds.height = 20;
             
@@ -123,7 +153,7 @@ int main(void) {
             switch(demoIndex) {
                 case DEMO_OFFSET:
                 {
-                    GuiLine(controlBounds, "Demo 1 : RectangleOffset()");
+                    GuiLine(controlBounds, TextFormat("Demo %d : RectangleOffset()", 1+DEMO_OFFSET));
                     controlBounds.y += controlBounds.height + 5.0f;
                     
                     LayoutFloatInput(&controlBounds, "Amount X", &demo0AmountX, -20.0f, 20.0f, 1);
@@ -136,7 +166,7 @@ int main(void) {
                 break;
                 case DEMO_INFLATE:
                 {
-                    GuiLine(controlBounds, "Demo 2 : RectangleInflate()");
+                    GuiLine(controlBounds, TextFormat("Demo %d : RectangleInflate()", 1+DEMO_INFLATE));
                     controlBounds.y += controlBounds.height + 5.0f;
                     
                     LayoutFloatInput(&controlBounds, "Amount", &demo1Amount, -20.0f, 20.0f, 1);
@@ -148,7 +178,7 @@ int main(void) {
                 break;
                 case DEMO_INFLATE_EX:
                 {
-                    GuiLine(controlBounds, "Demo 3 : RectangleInflateEx()");
+                    GuiLine(controlBounds, TextFormat("Demo %d : RectangleInflateEx()", 1+DEMO_INFLATE_EX));
                     controlBounds.y += controlBounds.height + 5.0f;
                     
                     LayoutFloatInput(&controlBounds, "Amount X", &demo2AmountX, -20.0f, 20.0f, 1);
@@ -161,7 +191,7 @@ int main(void) {
                 break;
                 case DEMO_POSITION:
                 {
-                    GuiLine(controlBounds, "Demo 3 : RectanglePosition()");
+                    GuiLine(controlBounds, TextFormat("Demo %d : RectanglePosition()", 1+DEMO_POSITION));
                     controlBounds.y += controlBounds.height + 5.0f;
                     
                     float minValue, maxValue;
@@ -203,7 +233,7 @@ int main(void) {
                 break;
                 case DEMO_GRID_CELL:
                 {
-                    GuiLine(controlBounds, "Demo 5 : RectangleGridCell()");
+                    GuiLine(controlBounds, TextFormat("Demo %d : RectangleGridCell()", 1+DEMO_GRID_CELL));
                     controlBounds.y += controlBounds.height + 5.0f;
                     
                     LayoutFloatInput(&controlBounds, "Grid Columns", &demo4ColCount, 1, 10.0f, 0);
@@ -244,7 +274,7 @@ int main(void) {
                 break;
                 case DEMO_GRID_CELL_EX:
                 {
-                    GuiLine(controlBounds, "Demo 6 : RectangleGridCellEx()");
+                    GuiLine(controlBounds, TextFormat("Demo %d : RectangleGridCellEx()", 1+DEMO_GRID_CELL_EX));
                     controlBounds.y += controlBounds.height + 5.0f;
                     
                     LayoutFloatInput(&controlBounds, "Grid Columns", &demo5ColCount, 1, 10.0f, 0);
@@ -291,15 +321,107 @@ int main(void) {
                     result = RectangleGridCellEx(container, demo5ColCount, demo5RowCount, demo5ColIndex, demo5RowIndex, demo5ColSpan, demo5RowSpan, demo5Spacing);
                 }
                 break;
+                case DEMO_SLICE_X:
+                {
+                    GuiLine(controlBounds, TextFormat("Demo %d : RectangleSliceVertical()", 1+DEMO_SLICE_X));
+                    controlBounds.y += controlBounds.height + 5.0f;
+                    
+                    LayoutFloatInput(&controlBounds, "Amount", &demo6Amount, -200.0f, 200.0f, 1);
+                    
+                    GuiLabel(controlBounds, "#191#");
+                    controlBounds = RectangleInflatePro(controlBounds, 0, 0, 10, -20);
+                    if (demo6Amount >= 0.0f) {
+                        GuiLabel(controlBounds, "Amount is zero or positive so we\nslice from the LEFT side");
+                    }
+                    else {
+                        GuiLabel(controlBounds, "Amount is negative so we\nslice from the RIGHT side");
+                    }
+                    
+                    sprintf(codeBuffer, "Rectangle result = RectangleSliceVertical(container, %.1ff);", demo6Amount);
+                    
+                    result = RectangleSliceVertical(container, demo6Amount);
+                }
+                break;
+                case DEMO_SLICE_Y:
+                {
+                    GuiLine(controlBounds, TextFormat("Demo %d : RectangleSliceHorizontal()", 1+DEMO_SLICE_Y));
+                    controlBounds.y += controlBounds.height + 5.0f;
+                    
+                    LayoutFloatInput(&controlBounds, "Amount", &demo7Amount, -200.0f, 200.0f, 1);
+                    
+                    GuiLabel(controlBounds, "#191#");
+                    controlBounds = RectangleInflatePro(controlBounds, 0, 0, 10, -20);
+                    if (demo7Amount >= 0.0f) {
+                        GuiLabel(controlBounds, "Amount is zero or positive so we\nslice from the TOP down");
+                    }
+                    else {
+                        GuiLabel(controlBounds, "Amount is negative so we\nslice from the BOTTOM up");
+                    }
+                    
+                    sprintf(codeBuffer, "Rectangle result = RectangleSliceHorizontal(container, %.1ff);", demo7Amount);
+                    
+                    result = RectangleSliceHorizontal(container, demo7Amount);
+                }
+                break;
+                case DEMO_SLICE_X_EX:
+                {
+                    GuiLine(controlBounds, TextFormat("Demo %d : RectangleSliceVerticalEx()", 1+DEMO_SLICE_X_EX));
+                    controlBounds.y += controlBounds.height + 5.0f;
+                    
+                    LayoutFloatInput(&controlBounds, "Amount", &demo8Amount, -200.0f, 200.0f, 1);
+                    LayoutFloatInput(&controlBounds, "Spacing", &demo8Spacing, 0.0f, 20.0f, 1);
+                    
+                    GuiLabel(controlBounds, "#191#");
+                    controlBounds = RectangleInflatePro(controlBounds, 0, 0, 10, -20);
+                    if (demo8Amount >= 0.0f) {
+                        GuiLabel(controlBounds, "Amount is zero or positive so we\nslice from the LEFT side");
+                    }
+                    else {
+                        GuiLabel(controlBounds, "Amount is negative so we\nslice from the RIGHT side");
+                    }
+                    
+                    sprintf(codeBuffer, "Rectangle result = RectangleSliceVerticalEx(container, %.1ff, %.1ff, &remainder);", demo8Amount, demo8Spacing);
+                    
+                    result = RectangleSliceVerticalEx(container, demo8Amount, demo8Spacing, &result2);
+                }
+                break;
+                case DEMO_SLICE_Y_EX:
+                {
+                    GuiLine(controlBounds, TextFormat("Demo %d : RectangleSliceHorizontalEx()", 1+DEMO_SLICE_X_EX));
+                    controlBounds.y += controlBounds.height + 5.0f;
+                    
+                    LayoutFloatInput(&controlBounds, "Amount", &demo9Amount, -container.width, container.width, 1);
+                    LayoutFloatInput(&controlBounds, "Spacing", &demo9Spacing, 0.0f, 20.0f, 1);
+                    
+                    GuiLabel(controlBounds, "#191#");
+                    controlBounds = RectangleInflatePro(controlBounds, 0, 0, 10, -20);
+                    if (demo9Amount >= 0.0f) {
+                        GuiLabel(controlBounds, "Amount is zero or positive so we\nslice from the TOP down");
+                    }
+                    else {
+                        GuiLabel(controlBounds, "Amount is negative so we\nslice from the BOTTOM up");
+                    }
+                    
+                    sprintf(codeBuffer, "Rectangle result = RectangleSliceHorizontalEx(container, %.1ff, %.1ff, &remainder);", demo9Amount, demo8Spacing);
+                    
+                    result = RectangleSliceHorizontalEx(container, demo9Amount, demo9Spacing, &result2);
+                }
+                break;
             }
             
             // Draw the result rectangle
+            if (result2.width > 0) DrawRectangleRec(result2, GetColor(0xefc9feff));
             DrawRectangleRec(result, GetColor(0xc9effeff));
             
             // Redraw the container outline so it's not obscured
             DrawRectangleLinesEx(container, 1.0f, Fade(GetColor(0x838383ff), .75f));
             
+            if (result2.width > 0) {
+                DrawRectangleLinesEx(result2, 1.0f, GetColor(0xb25bd9ff));
+                DrawRectangleGuides(result2, GetColor(0xb25bd9ff));
+            }
             DrawRectangleLinesEx(result, 1.0f, GetColor(0x5bb2d9ff));
+            DrawRectangleGuides(result, GetColor(0x5bb2d9ff));
             
             // Draw the code
             {
