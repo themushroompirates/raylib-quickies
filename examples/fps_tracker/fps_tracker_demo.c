@@ -2,8 +2,8 @@
 
 #include "raylib.h"
 
-#define FPS_TRACKER_IMPLEMENTATION
-#include "../src/mp_fps_tracker.h"
+#define MP_FPS_TRACKER_IMPLEMENTATION
+#include "../../src/mp_fps_tracker.h"
 
 void CreateObjectTransform(Transform *t) {
     // Random translation

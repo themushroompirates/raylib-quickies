@@ -1,11 +1,5 @@
-#ifndef FPS_TRACKER_H
-#define FPS_TRACKER_H
-
-/*
-#ifndef FPS_TRACKER_MAX_GUIDES
-#define FPS_TRACKER_MAX_GUIDES 4
-#endif
-*/
+#ifndef MP_FPS_TRACKER_H
+#define MP_FPS_TRACKER_H
 
 typedef struct FpsTrackerStyle {
     Color colBg;
@@ -14,24 +8,12 @@ typedef struct FpsTrackerStyle {
     float margin;
 } FpsTrackerStyle;
 
-/*
-typedef struct FpsTrackerGuide {
-    float value;
-    Color colour;
-} FpsTrackerGuide;
-*/
-
 typedef struct FpsTrackerData {
     int bufferSize;
     float *samples;
     Color *markers;
     
     int sampleIndex;
-    
-    /*
-    FpsTrackerGuide guides[FPS_TRACKER_MAX_GUIDES];
-    int guideCount;
-    */
     
     float minValue;
     float maxValue;
@@ -48,17 +30,16 @@ void SetFpsTrackerStyle(FpsTrackerStyle *style);
 
 #endif
 
-#ifdef FPS_TRACKER_IMPLEMENTATION
+#ifdef MP_FPS_TRACKER_IMPLEMENTATION
 
-#ifndef FPS_TRACKER_ALLOC
-#define FPS_TRACKER_ALLOC(bytes) MemAlloc(bytes)
+#ifndef MP_FPS_TRACKER_ALLOC
+#define MP_FPS_TRACKER_ALLOC(bytes) MemAlloc(bytes)
 #endif
 
-#ifndef FPS_TRACKER_FREE
-#define FPS_TRACKER_FREE(bytes) MemFree(bytes)
+#ifndef MP_FPS_TRACKER_FREE
+#define MP_FPS_TRACKER_FREE(bytes) MemFree(bytes)
 #endif
 
-//#include <math.h>
 #include "raylib.h"
 #include "raymath.h"
 #include "rlgl.h"
@@ -74,8 +55,8 @@ static FpsTrackerStyle style = {
 
 void InitFpsTracker(int bufferSize) {
     tracker.bufferSize = bufferSize;
-    tracker.samples = (float*)FPS_TRACKER_ALLOC(sizeof(float)*tracker.bufferSize);
-    tracker.markers = (Color*)FPS_TRACKER_ALLOC(sizeof(Color)*tracker.bufferSize);
+    tracker.samples = (float*)MP_FPS_TRACKER_ALLOC(sizeof(float)*tracker.bufferSize);
+    tracker.markers = (Color*)MP_FPS_TRACKER_ALLOC(sizeof(Color)*tracker.bufferSize);
     tracker.sampleIndex = 0;
     
     tracker.minValue = INFINITY;
@@ -83,7 +64,7 @@ void InitFpsTracker(int bufferSize) {
 }
 
 void UnloadFpsTracker() {
-    FPS_TRACKER_FREE(tracker.samples);
+    MP_FPS_TRACKER_FREE(tracker.samples);
     tracker.bufferSize = 0;
 }
 
@@ -180,6 +161,5 @@ void GetFpsTrackerStyle(FpsTrackerStyle *outStyle) {
 void SetFpsTrackerStyle(FpsTrackerStyle *inStyle) {
     style = *inStyle;
 }
-
 
 #endif
