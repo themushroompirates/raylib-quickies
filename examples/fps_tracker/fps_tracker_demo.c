@@ -5,6 +5,9 @@
 #define MP_FPS_TRACKER_IMPLEMENTATION
 #include "../../src/mp_fps_tracker.h"
 
+// This demo is a bit long, but not complicated.
+// We need to do *something* interesting to reduce the FPS...
+
 void CreateObjectTransform(Transform *t) {
     // Random translation
     t->translation = (Vector3) {
@@ -198,8 +201,14 @@ int main(void) {
     
     // ---------------------------  END MAIN LOOP  ----------------------------
     
+    // Cleanup
     MemFree(objectTransforms);
     
+    for (int i = 0; i < 4; i++) {
+        UnloadMesh(meshes[i]);
+    }
+    
+    // Unload the tracker!
     UnloadFpsTracker();
     
     CloseWindow();
