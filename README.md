@@ -11,3 +11,9 @@ Utility library for calculating rectangles. Inset, outset, grid layout, all that
 The demo showcases the functions visually.
 
 ![mp_rects demo screenshot](examples/rectangles/rectangles_demo.png)
+
+## mp_camera2d
+Simple library for managing 2d camera pan and zoom.
+Handles mouse/keyboard as well as touch.
+
+![mp_camera2d demo screenshot](examples/camera2d/camera2d_demo.png)
